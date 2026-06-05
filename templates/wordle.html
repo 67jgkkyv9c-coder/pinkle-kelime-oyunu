@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinkle - Kelime Oyunu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #FFF0F5; /* Tatlı Lavanta Pembesi Arka Plan */
+            color: #4A0E17; /* Okunması kolay mürdüm/koyu pembe yazı rengi */
+            font-family: Arial, sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        /* Kutuların genel kapsayıcı kutusu */
+        #board { 
+            display: flex;
+            flex-direction: column;
+            gap: 5px; 
+            margin-bottom: 20px; 
+        }
+        /* Her bir kelime satırının ayarı */
+        .row-grid { 
+            display: grid; 
+            gap: 5px; 
+        }
+        /* Tek bir harf kutusunun şık pembe kenarlıklı görünümü */
+        .tile { 
+            width: 55px; 
+            height: 55px; 
+            border: 2px solid #FFB6C1; /* Açık pembe kenarlıklar */
+            background-color: white;
+            color: #4A0E17;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border-radius: 8px; 
+        }
+        
+        /* YENİ PEMBE TEMA RENK KURALLARI */
+        /* 1. Harf tam yerindeyse (Eski Yeşil -> Yeni Seçtiğin Canlı Fuşya) */
+        .correct { 
+            background-color: #f8077d !important; 
+            border-color: #f8077d !important; 
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Harf daha okunaklı olsun diye hafif gölge */
+        }
+        /* 2. Harf kelimede var ama yeri yanlışsa (Eski Sarı -> Yeni Soft Pembe) */
+        .present { 
+            background-color: #FFB6C1 !important; 
+            border-color: #FFB6C1 !important; 
+            color: #4A0E17 !important;
+        }
+        /* 3. Harf kelimede hiç yoksa (Eski Gri -> Yeni Pastel Gri) */
+        .absent { 
+            background-color: #D3D3D3 !important; 
+            border-color: #D3D3D3 !important; 
+            color: white !important;
+        }
+
+        /* Giriş kutusu (Input) Tasarımı */
+        input { 
+            background-color: white !important; 
+            border: 2px solid #FFB6C1 !important; 
+            color: #4A0E17 !important; 
+            font-size: 1.2rem; 
+            padding: 10px; 
+            text-transform: uppercase; 
+            text-align: center; 
+            border-radius: 8px; 
+            width: 200px; 
+        }
+        input:focus { 
+            border-color: #FF69B4 !important; 
+            box-shadow: 0 0 5px rgba(255, 105, 180, 0.5) !important; 
+        }
+        
+        /* Pembe Temalı Butonlar */
+        .btn-pink {
+            background-color: #f8077d;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            border: none;
+        }
+        .btn-pink:hover {
+            background-color: #d00465; /* Üzerine gelince bir tık koyusu */
+            color: white;
+        }
+        .btn-pink:disabled {
+            background-color: #FFC0CB;
+            color: #FFF0F5;
+        }
+        .btn-outline-pink {
+            border: 2px solid #FF69B4;
+            color: #FF69B4;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+        .btn-outline-pink:hover {
+            background-color: #FF69B4;
+            color: white;
+        }
+        
+        /* Oyun bittiğinde veya kazanıldığında mesaj kutusunun rengi */
+        .pinkle-mesaj-hata {
+            color: #d50369 !important;
+        }
+        .pinkle-mesaj-basari {
+            color: #f8077d !important; /* Kazanınca da senin o ilk seçtiğin neon pembe yansın */
+        }
+/* Placeholder yazısının küçük harf kalmasını ve soft görünmesini sağlıyoruz */
+        input::placeholder {
+            text-transform: none !important;
+            color: #A9A9A9 !important; /* Soft gri tonu */
+            font-weight: normal !important;
+            font-size: 0.95rem !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="text-center">
+        <h2 class="fw-bold mb-4" style="color: #4A0E17;">☆ {{ harf_sayisi }} HARFLİ PINKLE</h2>
+        
+        <div class="grid" id="board"></div>
+
+        <div class="input-group mb-3" style="max-width: 300px; margin: 0 auto;">
+            <input type="text" id="guessInput" class="form-control text-center text-uppercase fw-bold" maxlength="{{ harf_sayisi }}" placeholder="{{ harf_sayisi }} harfli bir kelime girin...">
+            <button class="btn btn-pink px-4" onclick="tahminEt()" id="deneBtn">Dene</button>
+        </div>
+
+        <p id="mesaj" class="fw-bold mt-3"></p>
+        <a href="/" class="btn btn-outline-pink btn-sm mt-3"> ⁀➴♡ Ana Sayfaya Dön</a>
+    </div>
+
+    <script>
+        const harfSayisi = {{ harf_sayisi }};
+        const board = document.getElementById('board');
+        let aktifSatir = 0;
+
+        // Dinamik kutu dizilimi
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('div');
+            row.className = 'row-grid';
+            row.style.gridTemplateColumns = `repeat(${harfSayisi}, 1fr)`;
+            
+            for (let j = 0; j < harfSayisi; j++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.id = `tile-${i}-${j}`;
+                row.appendChild(tile);
+            }
+            board.appendChild(row);
+        }
+
+        function tahminEt() {
+            const input = document.getElementById('guessInput');
+            const tahmin = input.value.toUpperCase().trim();
+            const mesajBox = document.getElementById('mesaj');
+
+            if (tahmin.length !== harfSayisi) {
+                mesajBox.className = "pinkle-mesaj-hata fw-bold mt-2"; // Hata uyarısı artık senin istediğin koyu fuşya
+                mesajBox.innerText = `Lütfen ${harfSayisi} harfli bir kelime girin!`;
+                return;
+            }
+
+            fetch('/wordle-kontrol', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tahmin: tahmin })
+            })
+            .then(res => res.json())
+            .then(data => {
+                for (let j = 0; j < harfSayisi; j++) {
+                    const tile = document.getElementById(`tile-${aktifSatir}-${j}`);
+                    if (tile) {
+                        tile.innerText = tahmin[j];
+                        tile.classList.add(data.sonuc[j]);
+                    }
+                }
+
+                if (data.kazandi) {
+                    mesajBox.className = "pinkle-mesaj-basari fw-bold mt-3 fs-5"; // Kazanınca neon pembe sınıfımız devrede
+                    mesajBox.innerText = "Harika! Doğru kelimeyi buldunuz! *ੈ✩‧₊˚";
+                    input.disabled = true;
+                    document.getElementById('deneBtn').disabled = true;
+                } else {
+                    aktifSatir++;
+                    if (aktifSatir >= 6) {
+                        mesajBox.className = "pinkle-mesaj-hata fw-bold mt-3 fs-5"; // Oyun bitince aradığın o asil #d50369 rengi devrede!
+                        mesajBox.innerText = `Oyun bitti! Doğru kelime: ${data.dogru_kelime} ツ19:04 5.06.2026`;
+                        input.disabled = true;
+                        document.getElementById('deneBtn').disabled = true;
+                    } else {
+                        mesajBox.innerText = ""; 
+                    }
+                }
+                input.value = "";
+            });
+        }
+
+        // Klavye Dinleyicisi
+        document.addEventListener('keydown', function(event) {
+            const input = document.getElementById('guessInput');
+            if (input.disabled) return;
+
+            if (event.key === 'Enter') {
+                tahminEt();
+            } else {
+                if (document.activeElement !== input) {
+                    input.focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
