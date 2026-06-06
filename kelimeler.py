@@ -26,13 +26,13 @@ KELIME_HAVUZU = {
         "GÖMÜT", "MEZAR", "BAHÇE", "ANTRE", "SALON", "KİLER"
     ],
     6: [
-        "ATMACA", "AKBABA", "BALINA", "MEZGİT", "LEYLEK", "ÇİPURA", "PİRANA", "BÜLBÜL", "KUZGUN", "MAYMUN", 
+        "ATMACA", "AKBABA", "BALİNA", "MEZGİT", "LEYLEK", "ÇİPURA", "PİRANA", "BÜLBÜL", "KUZGUN", "MAYMUN", 
         "KAPLAN", "YARASA", "TİMSAH", "GÖRMEK", "SEVMEK", "BİLMEK", "SEZMEK", "SUSMAK", "GİTMEK", "GELMEK", 
         "DURMAK", "ÇAYLAK", "SAĞLAM", "SESSİZ", "PARLAK", "ŞANSLI", "UĞURLU", "ZENGİN", "AŞİKAR", "KAPALI", 
         "MUĞLAK", "YATKIN", "İNATÇI", "KORKAK", "HAYRAN", "ŞAŞKIN", "AYKIRI", "UYUMLU", "HIRSLI", "HUYSUZ", 
         "SARHOŞ", "GÜLÜNÇ", "GEVEZE", "ZAHMET", "KÜLFET", "HİZMET", "YARDIM", "TEKNİK", "HÜSRAN", "GURBET", 
         "YASTIK", "KIYMET", "KURŞUN", "CETVEL", "MEVCUT", "MERMER", "TAHSİL", "MERKÜR", "GERÇEK", "YAPRAK", 
-        "VARLIK", "TABİAT", "DÜŞMAN", "SEVİNÇ", "ŞÖMİNE", "DÜRBün", "TALEBE", "SARAKA", "HATIRA", "DENEME", 
+        "VARLIK", "TABİAT", "DÜŞMAN", "SEVİNÇ", "ŞÖMİNE", "DÜRBÜN", "TALEBE", "SARAKA", "HATIRA", "DENEME", 
         "MAKALE", "HİKAYE", "CENNET", "SAĞLIK", "SIHHAT", "DEFANS", "FORVET", "FUTBOL", "OFSAYT", "KALECİ"
     ]
 }
