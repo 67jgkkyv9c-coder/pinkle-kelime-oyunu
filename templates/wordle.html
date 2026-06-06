@@ -207,11 +207,16 @@
             });
         }
 
-        // Klavye Dinleyicisi
+        // Klavye Dinleyicisi (Yalnızca Türkçe Harf İzinli)
+        document.getElementById('guessInput').addEventListener('input', function(event) {
+            // Sadece Türkçe harfleri (büyük/küçük) kabul et, sembolleri ve sayıları anında sil
+            this.value = this.value.replace(/[^a-zA-ZççĞğİıÖöŞşÜü]/g, '');
+        });
+        
         document.addEventListener('keydown', function(event) {
             const input = document.getElementById('guessInput');
             if (input.disabled) return;
-
+        
             if (event.key === 'Enter') {
                 tahminEt();
             } else {
